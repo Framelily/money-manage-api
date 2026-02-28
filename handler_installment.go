@@ -46,6 +46,7 @@ type CreateInstallmentInput struct {
 
 type CreateInstallmentChild struct {
 	Month             int     `json:"month"`
+	Year              int     `json:"year"`
 	InstallmentNumber int     `json:"installmentNumber"`
 	Amount            float64 `json:"amount"`
 	Status            string  `json:"status"`
@@ -81,6 +82,7 @@ func CreateInstallment(c *gin.Context) {
 			ID:                uuid.New().String(),
 			PlanID:            plan.ID,
 			Month:             inst.Month,
+			Year:              inst.Year,
 			InstallmentNumber: inst.InstallmentNumber,
 			Amount:            inst.Amount,
 			Status:            status,

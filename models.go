@@ -33,6 +33,7 @@ type Installment struct {
 	ID                string  `gorm:"type:varchar(36);primaryKey" json:"id"`
 	PlanID            string  `gorm:"type:varchar(36);index;not null" json:"planId"`
 	Month             int     `gorm:"not null" json:"month"`
+	Year              int     `gorm:"default:0" json:"year"`
 	InstallmentNumber int     `gorm:"not null" json:"installmentNumber"`
 	Amount            float64 `gorm:"not null" json:"amount"`
 	Status            string  `gorm:"type:varchar(20);default:'unpaid'" json:"status"` // paid, unpaid
@@ -52,6 +53,7 @@ type BudgetMonthlyValue struct {
 	ID           string  `gorm:"type:varchar(36);primaryKey" json:"id"`
 	BudgetItemID string  `gorm:"type:varchar(36);index;not null" json:"budgetItemId"`
 	Month        string  `gorm:"type:varchar(20);not null" json:"month"` // Thai month abbreviations
+	Year         int     `gorm:"default:0" json:"year"`
 	Value        float64 `gorm:"default:0" json:"value"`
 }
 
