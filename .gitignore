@@ -1,0 +1,11 @@
+.env
+money-manage-api
+tmp/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+vendor/
