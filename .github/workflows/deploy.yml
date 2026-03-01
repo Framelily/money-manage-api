@@ -9,7 +9,7 @@ jobs:
   deploy:
     runs-on: self-hosted
     env:
-      APP_DIR: /home/deploy/money-manage
+      APP_DIR: /home/it23-server/money-manage
     steps:
       - name: Pull latest code
         run: |
