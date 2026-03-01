@@ -1,5 +1,6 @@
 .env
 money-manage-api
+dist/
 tmp/
 *.exe
 *.exe~

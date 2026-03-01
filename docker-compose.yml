@@ -1,0 +1,50 @@
+services:
+  db:
+    image: mysql:8.0
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-money123}
+      MYSQL_DATABASE: ${DB_NAME:-money_manage}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: .
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      PORT: "8080"
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_USER: root
+      DB_PASSWORD: ${DB_PASSWORD:-money123}
+      DB_NAME: ${DB_NAME:-money_manage}
+      JWT_SECRET: ${JWT_SECRET:-change_me_in_production}
+      GIN_MODE: release
+      STATIC_DIR: ./dist
+    volumes:
+      - ./dist:/app/dist:ro
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # Cloudflare Tunnel — ใส่ token แล้ว uncomment
+  # tunnel:
+  #   image: cloudflare/cloudflared:latest
+  #   restart: unless-stopped
+  #   command: tunnel --no-autoupdate run
+  #   environment:
+  #     TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
+  #   depends_on:
+  #     - api
+
+volumes:
+  mysql_data:

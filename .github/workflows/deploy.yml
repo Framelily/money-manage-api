@@ -1,0 +1,33 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+    env:
+      APP_DIR: /home/deploy/money-manage
+    steps:
+      - name: Pull latest code
+        run: |
+          cd $APP_DIR/money-manage && git pull origin main
+          cd $APP_DIR/money-manage-api && git pull origin main
+
+      - name: Build frontend
+        run: |
+          cd $APP_DIR/money-manage
+          npm ci
+          npm run build
+
+      - name: Copy dist to backend
+        run: |
+          rm -rf $APP_DIR/money-manage-api/dist
+          cp -r $APP_DIR/money-manage/dist $APP_DIR/money-manage-api/dist
+
+      - name: Restart services
+        run: |
+          cd $APP_DIR/money-manage-api
+          docker compose up -d --build
