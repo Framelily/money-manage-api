@@ -13,8 +13,8 @@ jobs:
     steps:
       - name: Pull latest code
         run: |
-          cd $APP_DIR/money-manage && git pull origin main
-          cd $APP_DIR/money-manage-api && git pull origin main
+          cd $APP_DIR/money-manage && git checkout -- . && git clean -fd && git pull origin main
+          cd $APP_DIR/money-manage-api && git checkout -- . && git clean -fd && git pull origin main
 
       - name: Build frontend
         run: |
