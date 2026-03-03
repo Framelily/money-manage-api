@@ -41,6 +41,7 @@ type CreateInstallmentInput struct {
 	TotalInstallments *int                     `json:"totalInstallments"`
 	IsClosed          bool                     `json:"isClosed"`
 	Note              *string                  `json:"note"`
+	ProviderColor     *string                  `json:"providerColor"`
 	Installments      []CreateInstallmentChild `json:"installments"`
 }
 
@@ -70,6 +71,7 @@ func CreateInstallment(c *gin.Context) {
 		TotalInstallments: input.TotalInstallments,
 		IsClosed:          input.IsClosed,
 		Note:              input.Note,
+		ProviderColor:     input.ProviderColor,
 		UserID:            userID,
 	}
 

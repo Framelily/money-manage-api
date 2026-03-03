@@ -23,6 +23,7 @@ type InstallmentPlan struct {
 	TotalInstallments *int          `json:"totalInstallments"` // nullable for Shopee PayLater
 	IsClosed          bool          `gorm:"default:false" json:"isClosed"`
 	Note              *string       `gorm:"type:text" json:"note,omitempty"`
+	ProviderColor     *string       `gorm:"type:varchar(20)" json:"providerColor,omitempty"`
 	UserID            string        `gorm:"type:varchar(36);index;not null" json:"userId"`
 	Installments      []Installment `gorm:"foreignKey:PlanID;constraint:OnDelete:CASCADE" json:"installments"`
 	CreatedAt         time.Time     `json:"createdAt"`
