@@ -12,7 +12,9 @@ func GetInstallments(c *gin.Context) {
 	userID := c.GetString("user_id")
 
 	var plans []InstallmentPlan
-	if err := DB.Where("user_id = ?", userID).Preload("Installments").Find(&plans).Error; err != nil {
+	if err := DB.Where("user_id = ?", userID).Preload("Installments", func(db *gorm.DB) *gorm.DB {
+		return db.Order("installment_number ASC")
+	}).Find(&plans).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch installments"})
 		return
 	}
@@ -25,7 +27,9 @@ func GetInstallment(c *gin.Context) {
 	id := c.Param("id")
 
 	var plan InstallmentPlan
-	if err := DB.Where("id = ? AND user_id = ?", id, userID).Preload("Installments").First(&plan).Error; err != nil {
+	if err := DB.Where("id = ? AND user_id = ?", id, userID).Preload("Installments", func(db *gorm.DB) *gorm.DB {
+		return db.Order("installment_number ASC")
+	}).First(&plan).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Installment plan not found"})
 		return
 	}
@@ -124,7 +128,9 @@ func UpdateInstallment(c *gin.Context) {
 	id := c.Param("id")
 
 	var plan InstallmentPlan
-	if err := DB.Where("id = ? AND user_id = ?", id, userID).Preload("Installments").First(&plan).Error; err != nil {
+	if err := DB.Where("id = ? AND user_id = ?", id, userID).Preload("Installments", func(db *gorm.DB) *gorm.DB {
+		return db.Order("installment_number ASC")
+	}).First(&plan).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Installment plan not found"})
 		return
 	}
@@ -187,7 +193,9 @@ func UpdateInstallment(c *gin.Context) {
 		}
 	}
 
-	DB.Where("id = ?", id).Preload("Installments").First(&plan)
+	DB.Where("id = ?", id).Preload("Installments", func(db *gorm.DB) *gorm.DB {
+		return db.Order("installment_number ASC")
+	}).First(&plan)
 	c.JSON(http.StatusOK, plan)
 }
 
