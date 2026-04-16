@@ -99,25 +99,92 @@ func CreateInstallment(c *gin.Context) {
 	c.JSON(http.StatusCreated, plan)
 }
 
+type UpdateInstallmentInput struct {
+	Provider          *string                  `json:"provider"`
+	Name              *string                  `json:"name"`
+	TotalAmount       *float64                 `json:"totalAmount"`
+	PerMonth          *float64                 `json:"perMonth"`
+	TotalInstallments *int                     `json:"totalInstallments"`
+	IsClosed          *bool                    `json:"isClosed"`
+	Note              *string                  `json:"note"`
+	ProviderColor     *string                  `json:"providerColor"`
+	Installments      []UpdateInstallmentChild `json:"installments"`
+}
+
+type UpdateInstallmentChild struct {
+	Month             int     `json:"month"`
+	Year              int     `json:"year"`
+	InstallmentNumber int     `json:"installmentNumber"`
+	Amount            float64 `json:"amount"`
+	Status            string  `json:"status"`
+}
+
 func UpdateInstallment(c *gin.Context) {
 	userID := c.GetString("user_id")
 	id := c.Param("id")
 
 	var plan InstallmentPlan
-	if err := DB.Where("id = ? AND user_id = ?", id, userID).First(&plan).Error; err != nil {
+	if err := DB.Where("id = ? AND user_id = ?", id, userID).Preload("Installments").First(&plan).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Installment plan not found"})
 		return
 	}
 
-	var input map[string]interface{}
+	var input UpdateInstallmentInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
-	if err := DB.Model(&plan).Updates(input).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update installment plan"})
-		return
+	// Update plan-level fields
+	updates := map[string]interface{}{}
+	if input.Provider != nil {
+		updates["provider"] = *input.Provider
+	}
+	if input.Name != nil {
+		updates["name"] = *input.Name
+	}
+	if input.TotalAmount != nil {
+		updates["total_amount"] = *input.TotalAmount
+	}
+	if input.PerMonth != nil {
+		updates["per_month"] = *input.PerMonth
+	}
+	if input.TotalInstallments != nil {
+		updates["total_installments"] = *input.TotalInstallments
+	}
+	if input.IsClosed != nil {
+		updates["is_closed"] = *input.IsClosed
+	}
+	if input.Note != nil {
+		updates["note"] = *input.Note
+	}
+	if input.ProviderColor != nil {
+		updates["provider_color"] = *input.ProviderColor
+	}
+
+	if len(updates) > 0 {
+		if err := DB.Model(&plan).Updates(updates).Error; err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to update installment plan"})
+			return
+		}
+	}
+
+	// Update individual installment amounts if provided
+	if len(input.Installments) > 0 {
+		existingMap := map[int]*Installment{}
+		for i := range plan.Installments {
+			existingMap[plan.Installments[i].InstallmentNumber] = &plan.Installments[i]
+		}
+
+		for _, inst := range input.Installments {
+			if existing, ok := existingMap[inst.InstallmentNumber]; ok {
+				DB.Model(existing).Updates(map[string]interface{}{
+					"amount": inst.Amount,
+					"month":  inst.Month,
+					"year":   inst.Year,
+				})
+			}
+		}
 	}
 
 	DB.Where("id = ?", id).Preload("Installments").First(&plan)
