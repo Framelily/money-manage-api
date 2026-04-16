@@ -32,6 +32,7 @@ func ConnectDatabase() {
 		&BudgetMonthlyValue{},
 		&PersonDebt{},
 		&DebtPayment{},
+		&DailyEntry{},
 	)
 	if err != nil {
 		log.Fatal("Failed to migrate database:", err)

@@ -80,3 +80,14 @@ type DebtPayment struct {
 	Date   string  `gorm:"type:varchar(20);not null" json:"date"` // DD/MM/YYYY Buddhist Era
 	Note   *string `gorm:"type:text" json:"note,omitempty"`
 }
+
+type DailyEntry struct {
+	ID        string    `gorm:"type:varchar(36);primaryKey" json:"id"`
+	UserID    string    `gorm:"type:varchar(36);index;not null" json:"userId"`
+	Category  string    `gorm:"type:varchar(100);not null;index" json:"category"`
+	Type      string    `gorm:"type:varchar(20);not null" json:"type"` // income, expense
+	Amount    float64   `gorm:"not null" json:"amount"`
+	Note      *string   `gorm:"type:text" json:"note,omitempty"`
+	EntryDate string    `gorm:"type:varchar(20);not null;index" json:"entryDate"` // DD/MM/YYYY Buddhist Era
+	CreatedAt time.Time `json:"createdAt"`
+}

@@ -48,5 +48,14 @@ func SetupRoutes(r *gin.Engine) {
 			debts.DELETE("/:id", DeleteDebt)
 			debts.POST("/:id/payment", RecordPayment)
 		}
+
+		// Daily entries
+		daily := protected.Group("/daily")
+		{
+			daily.GET("", GetDailyEntries)
+			daily.POST("", CreateDailyEntry)
+			daily.DELETE("/:id", DeleteDailyEntry)
+			daily.GET("/categories", GetDailyCategories)
+		}
 	}
 }
